@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Fungsi untuk memperbarui variabel CSS RGB dari warna hex
     function updateColorRGBVariables() {
         const rootStyle = getComputedStyle(document.documentElement);
-        // Helper function to safely get and trim CSS variables
+        // Fungsi bantuan untuk mendapatkan dan memotong variabel CSS dengan aman
         const getCssVar = (name) => rootStyle.getPropertyValue(name).trim();
 
         const primaryColorHex = getCssVar('--primary-color');
@@ -21,14 +21,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const accentColorHex = getCssVar('--accent-color');
         const textColorHex = getCssVar('--text-color');
         const cardBgHex = getCssVar('--card-bg');
-        const shadowColorHex = getCssVar('--shadow-color'); // Assuming shadow color might be needed in RGB
+        const shadowColorHex = getCssVar('--shadow-color'); // Mengasumsikan warna bayangan mungkin diperlukan dalam RGB
 
         document.documentElement.style.setProperty('--primary-color-rgb', hexToRgb(primaryColorHex));
         document.documentElement.style.setProperty('--secondary-color-rgb', hexToRgb(secondaryColorHex));
         document.documentElement.style.setProperty('--accent-color-rgb', hexToRgb(accentColorHex));
         document.documentElement.style.setProperty('--text-color-rgb', hexToRgb(textColorHex));
         document.documentElement.style.setProperty('--card-bg-rgb', hexToRgb(cardBgHex));
-        document.documentElement.style.setProperty('--shadow-color-rgb', hexToRgb(shadowColorHex, true)); // Pass true if it's an rgba value
+        document.documentElement.style.setProperty('--shadow-color-rgb', hexToRgb(shadowColorHex, true)); // Kirim true jika ini adalah nilai rgba
     }
 
     // Fungsi konversi Hex ke RGB (atau mengambil RGB dari rgba)
@@ -52,13 +52,14 @@ document.addEventListener('DOMContentLoaded', function() {
         updateSlidePosition();
         updateColorRGBVariables();
         loadTheme();
+        // Mengatur lebar kontainer slide dan masing-masing slide
         slidesContainer.style.width = `${totalSlides * 100}%`;
         slides.forEach(slide => slide.style.width = `${100 / totalSlides}%`);
     }
 
     // Membuat titik-titik navigasi
     function createDots() {
-        dotsNavigation.innerHTML = '';
+        dotsNavigation.innerHTML = ''; // Kosongkan titik navigasi yang ada
         slides.forEach((_, index) => {
             const dot = document.createElement('span');
             dot.classList.add('dot');
@@ -66,6 +67,7 @@ document.addEventListener('DOMContentLoaded', function() {
             dot.setAttribute('aria-label', `Ke Slide ${index + 1}`);
             dotsNavigation.appendChild(dot);
         });
+        // Tambahkan event listener ke setiap titik navigasi
         document.querySelectorAll('.dots-navigation .dot').forEach(dot => {
             dot.addEventListener('click', function() {
                 currentSlide = parseInt(this.getAttribute('data-slide'));
@@ -100,62 +102,71 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Memperbarui posisi slide dan elemen terkait
     function updateSlidePosition() {
+        // Menggeser kontainer slide
         slidesContainer.style.transform = `translateX(-${currentSlide * (100 / totalSlides)}%)`;
 
+        // Memperbarui status aktif titik navigasi
         const dots = document.querySelectorAll('.dots-navigation .dot');
         dots.forEach((dot, index) => {
             dot.classList.toggle('active', index === currentSlide);
         });
 
+        // Memperbarui status aktif slide dan animasi
         slides.forEach((slide, index) => {
             const isActive = index === currentSlide;
             slide.classList.toggle('active', isActive);
-            // Fokus pada slide aktif untuk aksesibilitas keyboard
+            // Fokus pada slide aktif untuk aksesibilitas keyboard dan animasi
             if (isActive) {
                 slide.setAttribute('tabindex', '-1'); // Memungkinkan fokus programatik
-                // slide.focus(); // Bisa terlalu agresif, pertimbangkan UX
+                // Menjalankan animasi setelah transisi slide selesai
                 setTimeout(() => {
                     animateStaggeredItems(slide);
-                    // PERBAIKAN: Ubah 'slide-2' menjadi 'slide-3' untuk animasi contoh Passive Voice
-                    if (slide.id === 'slide-3') {
+                    if (slide.id === 'slide-3') { // Animasi contoh untuk slide Passive Voice
                         animateExamples(slide);
                     }
-                }, 350); // Penundaan sedikit lebih lama untuk transisi slide yang lebih smooth
+                }, 350); // Penundaan untuk transisi slide
             } else {
                 slide.removeAttribute('tabindex');
-                resetAnimations(slide);
+                resetAnimations(slide); // Reset animasi pada slide yang tidak aktif
             }
+            slide.setAttribute('aria-hidden', !isActive); // Untuk aksesibilitas
         });
 
+
+        // Menonaktifkan tombol navigasi jika di slide pertama atau terakhir
         prevBtn.disabled = currentSlide === 0;
         nextBtn.disabled = currentSlide === totalSlides - 1;
-
-        slides.forEach((slide, index) => {
-            slide.setAttribute('aria-hidden', index !== currentSlide);
-        });
-        if (slides[currentSlide]) { // Pastikan slide ada
-            slides[currentSlide].removeAttribute('aria-hidden');
-        }
     }
 
     // Menerapkan animasi bertahap untuk item di slide saat ini
     function animateStaggeredItems(currentSlideElement) {
         const staggeredItems = currentSlideElement.querySelectorAll('.staggered-item');
         staggeredItems.forEach((item, index) => {
-            item.style.animation = 'none';
+            item.style.animation = 'none'; // Hapus animasi sebelumnya jika ada
             item.style.opacity = '0';
-            item.style.transform = 'translateY(30px) scale(0.95) rotateX(-10deg)';
-            item.style.filter = 'blur(2px)';
+            // Atur ulang transform dan filter ke kondisi awal animasi
+            const baseDelay = parseFloat(item.style.animationDelay) || 0; // Ambil delay dari HTML jika ada
+            const dynamicDelay = index * 100; // Delay dinamis per item
 
-            const delay = parseFloat(item.style.animationDelay) || (index * 120); // Penundaan lebih cepat dan dinamis
+            // Tentukan transform awal berdasarkan ID slide untuk variasi
+            let initialTransform = 'translateY(40px) scale(0.93) perspective(1000px) rotateX(-12deg)';
+            if (currentSlideElement.id === 'slide-1') { // Slide selamat datang
+                initialTransform = 'translateY(50px) scale(0.9) perspective(800px) rotateX(-15deg)';
+            } else if (currentSlideElement.id === 'slide-7') { // Slide terima kasih
+                 initialTransform = 'translateY(60px) scale(0.85) perspective(1200px) rotateX(-20deg)';
+            }
 
-            requestAnimationFrame(() => {
+            item.style.transform = initialTransform;
+            item.style.filter = 'blur(3px)';
+
+            requestAnimationFrame(() => { // Gunakan rAF untuk performa lebih baik
                  setTimeout(() => {
-                    item.style.transition = `opacity 0.7s ${delay}ms cubic-bezier(0.23, 1, 0.32, 1), transform 0.7s ${delay}ms cubic-bezier(0.23, 1, 0.32, 1), filter 0.7s ${delay}ms cubic-bezier(0.23, 1, 0.32, 1)`;
+                    // Terapkan transisi untuk animasi masuk yang halus
+                    item.style.transition = `opacity 0.8s ${baseDelay + dynamicDelay}ms cubic-bezier(0.23, 1, 0.32, 1), transform 0.8s ${baseDelay + dynamicDelay}ms cubic-bezier(0.23, 1, 0.32, 1), filter 0.6s ${baseDelay + dynamicDelay}ms ease-out`;
                     item.style.opacity = '1';
-                    item.style.transform = 'translateY(0) scale(1) rotateX(0deg)';
+                    item.style.transform = 'translateY(0) scale(1) perspective(1000px) rotateX(0deg)';
                     item.style.filter = 'blur(0)';
-                }, 50);
+                }, 50); // Penundaan kecil untuk memastikan reset gaya diterapkan
             });
         });
     }
@@ -166,16 +177,18 @@ document.addEventListener('DOMContentLoaded', function() {
         examples.forEach((example, index) => {
             const paragraphs = example.querySelectorAll('p');
             paragraphs.forEach((p, pIndex) => {
-                p.style.animation = 'none';
+                p.style.animation = 'none'; // Reset animasi sebelumnya
                 p.style.opacity = '0';
-                p.style.transform = 'translateX(-20px) skewX(-8deg)';
-                p.style.filter = 'blur(2.5px)';
+                // Atur ulang transform dan filter ke kondisi awal animasi
+                p.style.transform = 'translateX(-30px) skewX(-12deg)';
+                p.style.filter = 'blur(3.5px)';
 
-                const delay = (index * 350) + (pIndex * 80) + 250;
+                const delay = (index * 400) + (pIndex * 100) + 300; // Penundaan yang disesuaikan
 
                 requestAnimationFrame(() => {
-                    setTimeout(() => {
-                        p.style.animation = `slideInTextEnhancedV2 0.9s ${delay}ms cubic-bezier(0.165, 0.84, 0.44, 1) forwards`;
+                     setTimeout(() => {
+                        // Terapkan animasi CSS yang telah didefinisikan
+                        p.style.animation = `slideInTextEnhancedV2 1s ${delay}ms cubic-bezier(0.165, 0.84, 0.44, 1) forwards`;
                     }, 50);
                 });
             });
@@ -187,37 +200,38 @@ document.addEventListener('DOMContentLoaded', function() {
         const staggeredItems = slideElement.querySelectorAll('.staggered-item');
         staggeredItems.forEach(item => {
             item.style.opacity = '0';
-            item.style.transform = 'translateY(30px) scale(0.95) rotateX(-10deg)';
-            item.style.filter = 'blur(2px)';
-            item.style.transition = 'none';
+            item.style.transform = 'translateY(40px) scale(0.93) perspective(1000px) rotateX(-12deg)'; // Sesuaikan dengan animasi masuk
+            item.style.filter = 'blur(3px)';
+            item.style.transition = 'none'; // Hapus transisi agar reset instan
         });
-        const examples = slideElement.querySelectorAll('.animate-example p');
-        examples.forEach(p => {
+        const exampleParagraphs = slideElement.querySelectorAll('.animate-example p');
+        exampleParagraphs.forEach(p => {
             p.style.opacity = '0';
-            p.style.transform = 'translateX(-20px) skewX(-8deg)';
-            p.style.filter = 'blur(2.5px)';
-            p.style.animation = 'none';
+            p.style.transform = 'translateX(-30px) skewX(-12deg)'; // Sesuaikan dengan animasi masuk
+            p.style.filter = 'blur(3.5px)';
+            p.style.animation = 'none'; // Hapus animasi CSS
         });
     }
+
 
     // Mengganti tema (gelap/terang)
     function toggleTheme() {
         document.body.classList.toggle('dark-theme');
+        // Simpan preferensi tema pengguna di localStorage
         const isDarkModeAfterToggle = document.body.classList.contains('dark-theme');
-
         localStorage.setItem('theme', isDarkModeAfterToggle ? 'dark' : 'light');
-        updateColorRGBVariables();
+        updateColorRGBVariables(); // Perbarui variabel warna setelah tema berubah
     }
 
-    // Memuat tema dari localStorage
+    // Memuat tema dari localStorage saat halaman dimuat
     function loadTheme() {
         const savedTheme = localStorage.getItem('theme');
         if (savedTheme === 'dark') {
             document.body.classList.add('dark-theme');
         } else {
-            document.body.classList.remove('dark-theme');
+            document.body.classList.remove('dark-theme'); // Pastikan tema terang diterapkan jika tidak ada yang tersimpan atau 'light'
         }
-        updateColorRGBVariables();
+        updateColorRGBVariables(); // Perbarui variabel warna saat tema dimuat
     }
 
     // Event Listener untuk Tombol
@@ -229,16 +243,20 @@ document.addEventListener('DOMContentLoaded', function() {
     const topicsList = document.querySelectorAll('.welcome-topics li');
     topicsList.forEach(topic => {
         topic.addEventListener('click', function() {
-            const targetSlideIndex = parseInt(this.getAttribute('data-target-slide'));
             // data-target-slide adalah 0-indexed yang merujuk ke indeks array 'slides'
-            if (!isNaN(targetSlideIndex) && targetSlideIndex >= 0 && targetSlideIndex < totalSlides) {
+            // Slide "Our Team" adalah slide ke-2 (indeks 1)
+            // Slide "Passive Voice" adalah slide ke-3 (indeks 2)
+            // dst.
+            const targetSlideIndex = parseInt(this.getAttribute('data-target-slide'));
+             if (!isNaN(targetSlideIndex) && targetSlideIndex >= 0 && targetSlideIndex < totalSlides) {
                 goToSlide(targetSlideIndex);
             }
         });
     });
 
-    // Navigasi Keyboard
+    // Navigasi Keyboard (Arrow Keys, PageUp/Down, Home, End)
     document.addEventListener('keydown', function(e) {
+        // Abaikan input keyboard jika fokus ada pada elemen input
         const activeElement = document.activeElement;
         if (activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA' || activeElement.isContentEditable)) {
             return;
@@ -247,7 +265,7 @@ document.addEventListener('DOMContentLoaded', function() {
         switch (e.key) {
             case 'ArrowRight':
             case 'PageDown':
-                e.preventDefault();
+                e.preventDefault(); // Mencegah scroll default halaman
                 nextSlide();
                 break;
             case 'ArrowLeft':
@@ -269,11 +287,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Navigasi Swipe untuk Mobile
     let touchStartX = 0;
     let touchEndX = 0;
-    const swipeThreshold = 55;
+    const swipeThreshold = 50; // Jarak minimum swipe untuk dianggap sebagai swipe
 
     slidesContainer.addEventListener('touchstart', function(e) {
         touchStartX = e.changedTouches[0].screenX;
-    }, { passive: true });
+    }, { passive: true }); // { passive: true } untuk performa scroll yang lebih baik
 
     slidesContainer.addEventListener('touchend', function(e) {
         touchEndX = e.changedTouches[0].screenX;
@@ -282,9 +300,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function handleSwipe() {
         const swipeDistance = touchEndX - touchStartX;
-        if (swipeDistance < -swipeThreshold) {
+        if (swipeDistance < -swipeThreshold) { // Swipe ke kiri
             nextSlide();
-        } else if (swipeDistance > swipeThreshold) {
+        } else if (swipeDistance > swipeThreshold) { // Swipe ke kanan
             previousSlide();
         }
     }
@@ -294,15 +312,19 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('resize', () => {
         clearTimeout(resizeTimeout);
         resizeTimeout = setTimeout(() => {
+            // Atur ulang lebar kontainer dan slide
             slidesContainer.style.width = `${totalSlides * 100}%`;
             slides.forEach(slide => slide.style.width = `${100 / totalSlides}%`);
+            // Atur ulang transformasi tanpa animasi agar tidak terlihat aneh saat resize
             slidesContainer.style.transition = 'none';
             slidesContainer.style.transform = `translateX(-${currentSlide * (100 / totalSlides)}%)`;
+            // Kembalikan transisi setelah jeda singkat
             setTimeout(() => {
                 slidesContainer.style.transition = 'transform var(--transition-speed-slow) cubic-bezier(0.645, 0.045, 0.355, 1)';
             }, 50);
-        }, 100); // Debounce resize event
+        }, 100); // Debounce resize event untuk performa
     });
+
 
     // Panggil inisialisasi saat DOM siap
     initializePresentation();
