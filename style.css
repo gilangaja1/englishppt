@@ -56,7 +56,7 @@ html, body {
     width: 100%;
     margin: 0;
     padding: 0;
-    overflow: hidden;
+    overflow: hidden; /* Mencegah scrollbar pada body */
 }
 
 body {
@@ -74,12 +74,12 @@ body {
     width: 100%;
     height: 100%;
     position: relative;
-    overflow: hidden;
+    overflow: hidden; /* Mencegah konten slide meluap dari kontainer utama */
 }
 
 /* Kontainer untuk semua slide */
 .slides-container {
-    width: 400%; 
+    /* Lebar akan diatur oleh JavaScript (totalSlides * 100%) */
     height: 100%;
     display: flex;
     transition: transform var(--transition-speed-slow) cubic-bezier(0.645, 0.045, 0.355, 1); /* Easing yang lebih profesional */
@@ -87,21 +87,21 @@ body {
 
 /* Styling untuk setiap slide individual */
 .slide {
-    width: 25%; 
+    /* Lebar akan diatur oleh JavaScript (100 / totalSlides)% */
     height: 100%;
     padding: 2.5rem; /* Padding atas dan bawah untuk memberi ruang jika konten dimulai dari atas */
     display: flex;
     flex-direction: column;
-    justify-content: flex-start; /* PERUBAHAN: Konten dimulai dari atas */
+    justify-content: flex-start; /* Konten dimulai dari atas */
     align-items: center;
     position: relative;
     overflow-y: auto; /* Memungkinkan scroll jika konten lebih tinggi dari slide */
-    background: transparent; 
+    background: transparent;
 }
 
 /* Konten di dalam slide */
 .slide-content {
-    max-width: 900px; 
+    max-width: 900px;
     width: 100%;
     background: var(--card-bg);
     border-radius: var(--border-radius-md);
@@ -111,10 +111,10 @@ body {
     box-shadow: 0 15px 40px var(--shadow-color), 0 0 25px rgba(var(--primary-color-rgb), 0.07);
     opacity: 0;
     transform: translateY(60px) scale(0.93); /* Animasi masuk lebih jauh */
-    transition: opacity var(--transition-speed-normal) cubic-bezier(0.23, 1, 0.32, 1), 
-                transform var(--transition-speed-normal) cubic-bezier(0.23, 1, 0.32, 1), 
+    transition: opacity var(--transition-speed-normal) cubic-bezier(0.23, 1, 0.32, 1),
+                transform var(--transition-speed-normal) cubic-bezier(0.23, 1, 0.32, 1),
                 box-shadow var(--transition-speed-fast) ease;
-    border: 1px solid rgba(var(--text-color-rgb), 0.07); 
+    border: 1px solid rgba(var(--text-color-rgb), 0.07);
 }
 
 .slide.active .slide-content {
@@ -139,48 +139,48 @@ h1 {
 h1::after {
     content: '';
     position: absolute;
-    bottom: -15px; 
+    bottom: -15px;
     left: 50%;
     transform: translateX(-50%);
     width: 0px; /* Mulai dari 0 untuk animasi */
-    height: 5px; 
+    height: 5px;
     background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
     border-radius: 3px;
     transition: background var(--transition-speed-fast) ease, width var(--transition-speed-normal) cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.2s; /* Penundaan untuk animasi lebar */
 }
 
 .slide.active h1::after {
-    width: 130px; 
+    width: 130px;
 }
 
 /* Styling Sub-Judul (H2) */
 h2 {
     font-family: var(--font-heading);
-    font-size: 1.9rem; 
+    font-size: 1.9rem;
     font-weight: 600;
     color: var(--secondary-color);
     margin: 2.2rem 0 1.4rem;
     transition: color var(--transition-speed-fast) ease;
-    border-bottom: 3px solid rgba(var(--secondary-color-rgb), 0.15); 
+    border-bottom: 3px solid rgba(var(--secondary-color-rgb), 0.15);
     padding-bottom: 0.6rem;
 }
 
 /* Styling Paragraf */
 p, li {
     margin-bottom: 1.1rem;
-    line-height: 1.75; 
-    font-size: 1.08rem; 
+    line-height: 1.75;
+    font-size: 1.08rem;
     color: var(--text-color);
     opacity: 0.85; /* Opacity default untuk teks biasa */
 }
 
 ul {
-    list-style-position: outside; 
-    padding-left: 1.8rem; 
+    list-style-position: outside;
+    padding-left: 1.8rem;
 }
 
 li {
-    padding-left: 0.6rem; 
+    padding-left: 0.6rem;
 }
 
 /* Styling untuk contoh kode/teks */
@@ -203,7 +203,7 @@ li {
 /* Highlight teks penting */
 .highlight {
     color: var(--accent-color);
-    font-weight: 600; 
+    font-weight: 600;
     transition: color var(--transition-speed-fast) ease, background-color var(--transition-speed-fast) ease;
     padding: 0.15em 0.4em;
     background-color: rgba(var(--accent-color-rgb), 0.12);
@@ -218,44 +218,44 @@ li {
 /* Kontainer Navigasi */
 .navigation {
     position: fixed;
-    bottom: 2.2rem; 
+    bottom: 2.2rem;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
-    gap: 1.8rem; 
+    gap: 1.8rem;
     z-index: 1000;
 }
 
 /* Styling Tombol Navigasi */
 .nav-btn {
-    padding: 0.9rem 2.2rem; 
+    padding: 0.9rem 2.2rem;
     background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
     color: white;
     border: none;
-    border-radius: 50px; 
+    border-radius: 50px;
     cursor: pointer;
     font-weight: 600;
     font-family: var(--font-heading);
     font-size: 1rem;
     transition: all var(--transition-speed-fast) cubic-bezier(0.25, 0.8, 0.25, 1);
     box-shadow: 0 5px 15px rgba(var(--primary-color-rgb), 0.2);
-    text-transform: uppercase; 
+    text-transform: uppercase;
     letter-spacing: 0.8px;
 }
 
 .nav-btn:hover:not(:disabled) {
     background: linear-gradient(45deg, var(--secondary-color), var(--accent-color));
-    transform: translateY(-5px) scale(1.08); 
+    transform: translateY(-5px) scale(1.08);
     box-shadow: 0 10px 25px rgba(var(--secondary-color-rgb), 0.35);
 }
 
 .nav-btn:active:not(:disabled) {
-    transform: translateY(-2px) scale(1.03); 
+    transform: translateY(-2px) scale(1.03);
     box-shadow: 0 6px 18px rgba(var(--secondary-color-rgb), 0.25);
 }
 
 .nav-btn:disabled {
-    background: #A0A0A0; 
+    background: #A0A0A0;
     cursor: not-allowed;
     opacity: 0.6;
     box-shadow: none;
@@ -264,16 +264,16 @@ li {
 /* Navigasi Titik */
 .dots-navigation {
     position: fixed;
-    bottom: 7rem; 
+    bottom: 7rem;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
-    gap: 1rem; 
+    gap: 1rem;
     z-index: 1000;
 }
 
 .dot {
-    width: 14px; 
+    width: 14px;
     height: 14px;
     border-radius: 50%;
     background-color: rgba(var(--text-color-rgb), 0.2);
@@ -325,10 +325,10 @@ li {
 }
 
 .table th, .table td {
-    padding: 1.1rem 1.3rem; 
+    padding: 1.1rem 1.3rem;
     text-align: left;
     border-bottom: 1px solid rgba(var(--text-color-rgb), 0.08);
-    font-size: 0.98rem; 
+    font-size: 0.98rem;
 }
 
 .table th {
@@ -365,11 +365,11 @@ li {
 }
 
 .welcome-text h1 {
-    font-size: 3.4rem; 
+    font-size: 3.4rem;
 }
 
 .welcome-subtitle {
-    font-size: 1.35rem; 
+    font-size: 1.35rem;
     color: var(--text-color);
     opacity: 0.75;
     margin-bottom: 2.8rem;
@@ -474,11 +474,11 @@ li {
 }
 
 .feature-icon {
-    margin-right: 1.5rem; 
+    margin-right: 1.5rem;
     flex-shrink: 0;
     color: var(--accent-color);
     background-color: rgba(var(--accent-color-rgb), 0.18);
-    width: 52px; 
+    width: 52px;
     height: 52px;
     border-radius: 50%;
     display: flex;
@@ -509,20 +509,20 @@ li {
 .feature-content h3 {
     font-family: var(--font-heading);
     color: var(--accent-color);
-    margin-top: 0; 
+    margin-top: 0;
     margin-bottom: 0.6rem;
-    font-size: 1.3rem; 
+    font-size: 1.3rem;
 }
 
 /* Tombol Ganti Tema */
 .theme-toggle {
     position: fixed;
-    top: 28px; 
+    top: 28px;
     right: 28px;
     background: var(--card-bg);
     border: 1px solid rgba(var(--text-color-rgb), 0.12);
     border-radius: 50%;
-    width: 52px; 
+    width: 52px;
     height: 52px;
     display: flex;
     align-items: center;
@@ -531,7 +531,7 @@ li {
     box-shadow: 0 4px 14px var(--shadow-color);
     z-index: 2000;
     transition: all var(--transition-speed-fast) cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Springy transition */
-    overflow: hidden; 
+    overflow: hidden;
 }
 
 .theme-toggle:hover {
@@ -543,7 +543,7 @@ li {
 }
 
 .theme-toggle .icon {
-    font-size: 1.6rem; 
+    font-size: 1.6rem;
     transition: opacity var(--transition-speed-normal) ease, transform var(--transition-speed-normal) cubic-bezier(0.68, -0.55, 0.265, 1.55);
     position: absolute;
 }
@@ -554,6 +554,59 @@ li {
 .dark-theme .theme-toggle .icon-moon { opacity: 0; transform: translateY(-120%) rotate(180deg) scale(0.5); }
 .dark-theme .theme-toggle .icon-sun { opacity: 1; transform: translateY(0) rotate(0deg) scale(1); }
 
+
+/* Styling untuk Slide Anggota Tim */
+.team-members-container {
+    display: flex;
+    flex-wrap: wrap; /* Memungkinkan anggota untuk pindah ke baris berikutnya pada layar kecil */
+    justify-content: space-around; /* Mendistribusikan ruang di sekitar anggota */
+    align-items: flex-start; /* Menyelaraskan anggota ke atas */
+    gap: 2rem; /* Jarak antar blok anggota */
+    margin-top: 2rem;
+}
+
+.team-member {
+    flex-basis: calc(30% - 2rem); /* Bertujuan untuk 3 anggota per baris, menyesuaikan dengan gap. Bisa disesuaikan */
+    min-width: 180px; /* Lebar minimum untuk setiap blok anggota */
+    text-align: center;
+    padding: 1.5rem;
+    background-color: rgba(var(--card-bg-rgb), 0.85); /* Latar belakang kartu sedikit transparan */
+    border-radius: var(--border-radius-md);
+    box-shadow: 0 8px 20px var(--shadow-color);
+    transition: transform var(--transition-speed-fast) ease, box-shadow var(--transition-speed-fast) ease;
+    border: 1px solid rgba(var(--primary-color-rgb), 0.15);
+}
+
+.team-member:hover {
+    transform: translateY(-8px) scale(1.03);
+    box-shadow: 0 12px 28px var(--shadow-color-hover);
+}
+
+.member-photo {
+    width: 150px; /* Sesuaikan sesuai kebutuhan */
+    height: 150px; /* Sesuaikan sesuai kebutuhan */
+    border-radius: 50%; /* Membuat foto menjadi lingkaran */
+    object-fit: cover; /* Memastikan gambar menutupi area tanpa distorsi */
+    margin-bottom: 1.2rem;
+    border: 4px solid var(--primary-color);
+    box-shadow: 0 4px 10px rgba(var(--primary-color-rgb), 0.2);
+    transition: transform var(--transition-speed-fast) ease, border-color var(--transition-speed-fast) ease;
+}
+.team-member:hover .member-photo {
+    transform: scale(1.05);
+    border-color: var(--accent-color);
+}
+
+.member-name {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: 1.2rem;
+    color: var(--primary-color);
+    margin-top: 0.5rem;
+    margin-bottom: 0; /* Hapus margin bawah default dari paragraf */
+}
+
+
 /* Penyesuaian untuk responsivitas */
 @media (max-width: 992px) { /* Tablet */
     .slide { padding: 2rem; }
@@ -561,6 +614,7 @@ li {
     h1 { font-size: 2.7rem; }
     h2 { font-size: 1.7rem; }
     .welcome-text h1 { font-size: 3rem; }
+    .team-member { flex-basis: calc(45% - 2rem); } /* 2 anggota per baris */
 }
 
 @media (max-width: 768px) { /* Mobile besar */
@@ -579,6 +633,8 @@ li {
     .welcome-text h1 { font-size: 2.7rem; }
     .welcome-subtitle { font-size: 1.2rem; }
     .welcome-topics li { padding: 0.8rem 1.8rem; font-size: 0.95rem; }
+    .team-member { flex-basis: calc(100% - 2rem); } /* 1 anggota per baris */
+    .member-photo { width: 120px; height: 120px; }
 }
 
 @media (max-width: 480px) { /* Mobile kecil */
@@ -594,8 +650,10 @@ li {
     .theme-toggle { top: 18px; right: 18px; width: 44px; height: 44px; }
     .theme-toggle .icon { font-size: 1.3rem; }
     .table th, .table td { padding: 0.9rem; font-size: 0.92rem; }
-    .analytical-feature { flex-direction: column; align-items: flex-start; text-align: left; } /* Reverted from center for better readability */
+    .analytical-feature { flex-direction: column; align-items: flex-start; text-align: left; }
     .feature-icon { margin-bottom: 1rem; }
+    .member-photo { width: 100px; height: 100px; }
+    .member-name { font-size: 1.1rem; }
 }
 
 /* Keyframes untuk animasi umum yang lebih halus */
