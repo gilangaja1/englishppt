@@ -126,6 +126,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const isActive = index === currentSlide;
             slide.classList.toggle('active', isActive);
             if (isActive) {
+                // PERBAIKAN: Scroll slide aktif ke atas (untuk "repeat slide")
+                slide.scrollTop = 0;
                 slide.setAttribute('tabindex', '-1'); // Fokus ke slide aktif untuk aksesibilitas
                 // Jalankan animasi setelah transisi slide selesai
                 // Penundaan sedikit lebih pendek dari transisi slide agar animasi elemen mulai sebelum slide berhenti total
@@ -311,7 +313,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Navigasi Swipe untuk Perangkat Mobile
+    // MODIFIKASI: Navigasi Swipe untuk Perangkat Mobile DINONAKTIFKAN
+    /*
     let touchStartX = 0;
     let touchEndX = 0;
     const swipeThreshold = 50; // Jarak minimum swipe agar dianggap valid
@@ -333,6 +336,7 @@ document.addEventListener('DOMContentLoaded', function() {
             previousSlide();
         }
     }
+    */
 
     // Menangani perubahan ukuran window (resize)
     let resizeTimeout;
