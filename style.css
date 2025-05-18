@@ -14,9 +14,9 @@
     --font-special: 'Pacifico', cursive;
     --border-radius-sm: 14px; /* Sedikit lebih bulat */
     --border-radius-md: 28px; /* Sedikit lebih bulat */
-    --transition-speed-fast: 0.3s; /* Sedikit diperlambat untuk kehalusan */
-    --transition-speed-normal: 0.5s;
-    --transition-speed-slow: 0.8s; /* Transisi slide utama lebih lambat dan halus */
+    --transition-speed-fast: 0.3s; 
+    --transition-speed-normal: 0.6s; /* Sedikit diperlambat untuk flip yang lebih terlihat */
+    --transition-speed-slow: 0.8s; 
 
     /* Variabel RGB untuk opacity */
     --primary-color-rgb: 74, 144, 226;
@@ -24,7 +24,7 @@
     --accent-color-rgb: 245, 166, 35;
     --text-color-rgb: 51, 51, 51;
     --card-bg-rgb: 255, 255, 255;
-    --shadow-color-rgb: 0,0,0; /* Digunakan untuk shadow dengan alpha */
+    --shadow-color-rgb: 0,0,0; 
 }
 
 /* Tema Gelap */
@@ -59,7 +59,7 @@ html, body {
     width: 100%;
     margin: 0;
     padding: 0;
-    overflow: hidden; /* Mencegah scrollbar ganda */
+    overflow: hidden; 
 }
 
 body {
@@ -71,61 +71,123 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     font-size: 16px;
+    padding-top: 10px; 
 }
+
+/* Progress Bar Styling */
+.progress-bar-container {
+    position: fixed; 
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 10px; 
+    background-color: rgba(var(--text-color-rgb), 0.1); 
+    z-index: 2000; 
+    box-shadow: 0 2px 5px rgba(var(--shadow-color-rgb), 0.1);
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0%; 
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color), var(--accent-color));
+    background-size: 200% 100%; 
+    border-radius: 0 5px 5px 0; 
+    transition: width var(--transition-speed-normal) cubic-bezier(0.65, 0, 0.35, 1), background-position var(--transition-speed-slow) ease; 
+    animation: progressBarShine 2s infinite linear; 
+}
+
+@keyframes progressBarShine {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
 
 /* Kontainer Presentasi Utama */
 .presentation-container {
     width: 100%;
-    height: 100%;
+    height: calc(100% - 10px); 
     position: relative;
-    overflow: hidden;
-    perspective: 1500px; /* Tambahkan perspektif untuk efek 3D pada slide */
+    overflow: hidden; 
+    perspective: 1800px; /* Tambahkan/Sesuaikan perspektif untuk efek 3D */
 }
 
 /* Kontainer untuk semua slide */
 .slides-container {
     height: 100%;
     display: flex;
-    /* Menggunakan cubic-bezier yang lebih dinamis untuk transisi slide */
     transition: transform var(--transition-speed-slow) cubic-bezier(0.86, 0, 0.07, 1);
+    transform-style: preserve-3d; /* Penting untuk transformasi 3D anak-anak */
 }
 
 /* Styling untuk setiap slide individual */
 .slide {
     height: 100%;
-    padding: 2rem 1.5rem 9rem 1.5rem; /* Padding bawah lebih besar untuk mengakomodasi navigasi */
+    padding: 2rem 1.5rem 9rem 1.5rem; 
     display: flex;
     flex-direction: column;
-    justify-content: flex-start; /* Konten mulai dari atas */
+    justify-content: flex-start; 
     align-items: center;
     position: relative;
-    overflow-y: auto; /* Scroll jika konten melebihi tinggi */
-    background: transparent; /* Latar belakang slide transparan */
+    overflow-y: auto; 
+    background: transparent; 
+    
+    /* Properti untuk transisi flip */
+    backface-visibility: hidden; /* Sembunyikan bagian belakang saat flip */
+    transform-origin: center center;
+    transition: transform var(--transition-speed-normal) cubic-bezier(0.680, -0.550, 0.265, 1.550), /* Easing untuk efek 'bounce' pada flip */
+                opacity var(--transition-speed-normal) ease-in-out;
+    opacity: 0; /* Default slide tidak terlihat */
+    transform: scale(0.95) rotateY(0deg); /* Sedikit kecil dan datar sebagai default non-active */
 }
+
+/* Keadaan awal slide yang akan masuk dari kanan (next) */
+.slide.prepare-flip-right {
+    opacity: 0;
+    transform: translateX(40%) rotateY(80deg) scale(0.9); /* Mulai dari kanan, terotasi, sedikit lebih kecil */
+}
+
+/* Keadaan awal slide yang akan masuk dari kiri (prev) */
+.slide.prepare-flip-left {
+    opacity: 0;
+    transform: translateX(-40%) rotateY(-80deg) scale(0.9); /* Mulai dari kiri, terotasi, sedikit lebih kecil */
+}
+
+/* Slide yang aktif */
+.slide.active {
+    opacity: 1;
+    transform: translateX(0) rotateY(0deg) scale(1); /* Kembali ke posisi normal, datar, ukuran penuh */
+    z-index: 10; /* Pastikan slide aktif di atas */
+}
+
 
 /* Konten di dalam slide */
 .slide-content {
-    max-width: 950px; /* Lebar maksimum konten */
+    max-width: 950px; 
     width: 100%;
     background: var(--card-bg);
     border-radius: var(--border-radius-md);
     padding: 2.5rem 3rem;
-    margin-top: 2rem; /* Beri jarak dari atas slide */
-    margin-bottom: 2.5rem; /* Beri jarak dari bawah sebelum navigasi */
+    margin-top: 1rem; 
+    margin-bottom: 2.5rem; 
     box-shadow: 0 20px 50px -10px rgba(var(--shadow-color-rgb), 0.12), 0 0 35px -15px rgba(var(--primary-color-rgb), 0.1);
-    opacity: 0; /* Awalnya tidak terlihat, dianimasikan oleh JS */
-    transform: translateY(80px) scale(0.9) perspective(1000px) rotateX(-12deg); /* Animasi masuk lebih dramatis */
+    /* Transisi pada slide-content dipertahankan untuk animasi staggered item, bukan untuk flip */
+    opacity: 0; 
+    transform: translateY(80px) scale(0.9) perspective(1000px) rotateX(-12deg); 
     transform-origin: bottom center;
-    transition: opacity var(--transition-speed-normal) cubic-bezier(0.23, 1, 0.32, 1) 0.1s, /* Sedikit delay opacity */
+    transition: opacity var(--transition-speed-normal) cubic-bezier(0.23, 1, 0.32, 1) 0.1s, 
                 transform var(--transition-speed-normal) cubic-bezier(0.23, 1, 0.32, 1),
                 box-shadow var(--transition-speed-normal) ease;
     border: 1px solid rgba(var(--text-color-rgb), 0.07);
 }
 
-.slide.active .slide-content {
+.slide.active .slide-content { /* Ini untuk animasi staggered item, bukan flip */
     opacity: 1;
     transform: translateY(0) scale(1) perspective(1000px) rotateX(0deg);
-    box-shadow: 0 25px 65px -12px rgba(var(--shadow-color-rgb), 0.2), 0 0 40px -20px rgba(var(--primary-color-rgb), 0.15); /* Bayangan lebih menonjol */
+    box-shadow: 0 25px 65px -12px rgba(var(--shadow-color-rgb), 0.2), 0 0 40px -20px rgba(var(--primary-color-rgb), 0.15); 
 }
 
 /* Styling Judul Utama (H1) */
@@ -135,48 +197,48 @@ h1 {
     font-weight: 700;
     color: var(--primary-color);
     margin-top: 0;
-    margin-bottom: 2.5rem; /* Margin bawah lebih besar */
+    margin-bottom: 2.5rem; 
     text-align: center;
     position: relative;
-    text-shadow: 0 2px 8px rgba(var(--primary-color-rgb), 0.2); /* Text shadow lebih halus */
+    text-shadow: 0 2px 8px rgba(var(--primary-color-rgb), 0.2); 
 }
 
 h1::after {
     content: '';
     position: absolute;
-    bottom: -18px; /* Posisi garis bawah */
+    bottom: -18px; 
     left: 50%;
     transform: translateX(-50%);
-    width: 0px; /* Awalnya tidak terlihat, dianimasikan saat slide aktif */
-    height: 6px; /* Garis bawah lebih tebal */
+    width: 0px; 
+    height: 6px; 
     background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
     border-radius: 3px;
-    transition: background var(--transition-speed-fast) ease, width var(--transition-speed-normal) cubic-bezier(0.68, -0.6, 0.265, 1.6) 0.2s; /* Easing lebih dinamis */
+    transition: background var(--transition-speed-fast) ease, width var(--transition-speed-normal) cubic-bezier(0.68, -0.6, 0.265, 1.6) 0.2s; 
 }
 
 .slide.active h1::after {
-    width: clamp(120px, 22vw, 180px); /* Lebar garis bawah saat slide aktif */
+    width: clamp(120px, 22vw, 180px); 
 }
 
 /* Styling Sub-Judul (H2) */
 h2 {
     font-family: var(--font-heading);
-    font-size: clamp(1.6rem, 4vw, 2.1rem); /* Sedikit lebih besar */
+    font-size: clamp(1.6rem, 4vw, 2.1rem); 
     font-weight: 600;
     color: var(--secondary-color);
     margin: 2.5rem 0 1.5rem;
     transition: color var(--transition-speed-fast) ease;
-    border-bottom: 4px solid rgba(var(--secondary-color-rgb), 0.25); /* Border lebih tebal */
+    border-bottom: 4px solid rgba(var(--secondary-color-rgb), 0.25); 
     padding-bottom: 0.8rem;
 }
 
 /* Styling Paragraf */
 p, li {
     margin-bottom: 1.2rem;
-    line-height: 1.75; /* Keterbacaan lebih baik */
+    line-height: 1.75; 
     font-size: clamp(0.95rem, 2.2vw, 1.1rem);
     color: var(--text-color);
-    opacity: 0.9; /* Sedikit transparan untuk teks tubuh */
+    opacity: 0.9; 
 }
 
 ul {
@@ -185,24 +247,24 @@ ul {
 }
 
 li {
-    padding-left: 0.8rem; /* Jarak antara bullet dan teks */
+    padding-left: 0.8rem; 
 }
 
 /* Styling untuk contoh kode/teks */
 .example {
-    background: rgba(var(--secondary-color-rgb), 0.08); /* Sedikit lebih transparan */
+    background: rgba(var(--secondary-color-rgb), 0.08); 
     border-left: 7px solid var(--secondary-color);
     padding: 1.4rem 1.8rem;
     margin: 1.8rem 0;
     border-radius: var(--border-radius-sm);
-    transition: all var(--transition-speed-fast) cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Easing lebih halus */
+    transition: all var(--transition-speed-fast) cubic-bezier(0.25, 0.46, 0.45, 0.94); 
     box-shadow: 0 8px 20px -5px rgba(var(--secondary-color-rgb), 0.1);
 }
 
 .example:hover {
-    transform: translateY(-5px) scale(1.02); /* Efek hover lebih halus */
+    transform: translateY(-5px) scale(1.02); 
     box-shadow: 0 10px 25px -5px rgba(var(--secondary-color-rgb), 0.2);
-    border-left-color: var(--accent-color); /* Ubah warna border saat hover */
+    border-left-color: var(--accent-color); 
 }
 
 /* Highlight teks penting */
@@ -211,14 +273,14 @@ li {
     font-weight: 700;
     transition: color var(--transition-speed-fast) ease, background-color var(--transition-speed-fast) ease, transform var(--transition-speed-fast) ease;
     padding: 0.25em 0.5em;
-    background-color: rgba(var(--accent-color-rgb), 0.18); /* Latar belakang lebih terlihat */
+    background-color: rgba(var(--accent-color-rgb), 0.18); 
     border-radius: 6px;
-    display: inline-block; /* Agar transform bekerja */
+    display: inline-block; 
 }
 .highlight:hover {
     background-color: rgba(var(--accent-color-rgb), 0.3);
     text-shadow: 0 0 12px rgba(var(--accent-color-rgb), 0.4);
-    transform: scale(1.05); /* Sedikit membesar saat hover */
+    transform: scale(1.05); 
 }
 
 
@@ -230,29 +292,29 @@ li {
     transform: translateX(-50%);
     display: flex;
     gap: 1.8rem;
-    z-index: 1000; /* Pastikan di atas elemen lain */
+    z-index: 1000; 
 }
 
 /* Styling Tombol Navigasi */
 .nav-btn {
-    padding: 0.9rem 2.2rem; /* Padding lebih besar */
+    padding: 0.9rem 2.2rem; 
     background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
     color: white;
     border: none;
-    border-radius: 50px; /* Tombol bulat */
+    border-radius: 50px; 
     cursor: pointer;
     font-weight: 600;
     font-family: var(--font-heading);
     font-size: clamp(0.9rem, 2.5vw, 1.05rem);
     transition: all var(--transition-speed-fast) cubic-bezier(0.25, 0.8, 0.25, 1);
-    box-shadow: 0 8px 20px -6px rgba(var(--primary-color-rgb), 0.35); /* Bayangan lebih halus */
+    box-shadow: 0 8px 20px -6px rgba(var(--primary-color-rgb), 0.35); 
     text-transform: uppercase;
     letter-spacing: 1px;
 }
 
 .nav-btn:hover:not(:disabled) {
     background: linear-gradient(45deg, var(--secondary-color), var(--accent-color));
-    transform: translateY(-6px) scale(1.1); /* Efek hover lebih menonjol */
+    transform: translateY(-6px) scale(1.1); 
     box-shadow: 0 12px 28px -8px rgba(var(--secondary-color-rgb), 0.5);
 }
 
@@ -262,7 +324,7 @@ li {
 }
 
 .nav-btn:disabled {
-    background: #A0A0A0; /* Warna abu-abu untuk tombol nonaktif */
+    background: #A0A0A0; 
     cursor: not-allowed;
     opacity: 0.5;
     box-shadow: none;
@@ -272,7 +334,7 @@ li {
 /* Navigasi Titik */
 .dots-navigation {
     position: fixed;
-    bottom: 7rem; /* Lebih dekat dengan tombol */
+    bottom: 7rem; 
     left: 50%;
     transform: translateX(-50%);
     display: flex;
@@ -281,15 +343,15 @@ li {
 }
 
 .dot {
-    width: 16px; /* Titik lebih besar */
+    width: 16px; 
     height: 16px;
     border-radius: 50%;
-    background-color: rgba(var(--text-color-rgb), 0.2); /* Lebih gelap sedikit */
+    background-color: rgba(var(--text-color-rgb), 0.2); 
     cursor: pointer;
     transition: all var(--transition-speed-fast) cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative; /* Untuk pseudo-element ::before */
+    position: relative; 
 }
-.dot::before { /* Efek fill saat aktif/hover */
+.dot::before { 
     content: '';
     position: absolute;
     top: 50%;
@@ -299,41 +361,41 @@ li {
     background-color: var(--primary-color);
     border-radius: 50%;
     transform: translate(-50%, -50%) scale(0);
-    transition: transform var(--transition-speed-fast) cubic-bezier(0.34, 1.56, 0.64, 1); /* Easing lebih 'bouncy' */
+    transition: transform var(--transition-speed-fast) cubic-bezier(0.34, 1.56, 0.64, 1); 
 }
 
 
 .dot:hover:not(.active) {
     background-color: rgba(var(--text-color-rgb), 0.4);
-    transform: scale(1.15); /* Sedikit membesar saat hover */
+    transform: scale(1.15); 
 }
 .dot:hover:not(.active)::before {
-    transform: translate(-50%, -50%) scale(0.7); /* Efek fill parsial saat hover */
+    transform: translate(-50%, -50%) scale(0.7); 
 }
 
 .dot.active {
-    background-color: rgba(var(--primary-color-rgb), 0.4); /* Warna latar belakang titik aktif */
+    background-color: rgba(var(--primary-color-rgb), 0.4); 
     transform: scale(1.1);
 }
 .dot.active::before {
-    transform: translate(-50%, -50%) scale(1); /* Efek fill penuh saat aktif */
+    transform: translate(-50%, -50%) scale(1); 
 }
 
 
 /* Styling Tabel */
 .table-container {
-    overflow-x: auto; /* Scroll horizontal jika tabel terlalu lebar */
+    overflow-x: auto; 
     margin: 2.2rem 0;
     border-radius: var(--border-radius-sm);
-    box-shadow: 0 10px 25px -8px var(--shadow-color); /* Bayangan lebih halus */
+    box-shadow: 0 10px 25px -8px var(--shadow-color); 
     border: 1px solid rgba(var(--text-color-rgb), 0.1);
-    -webkit-overflow-scrolling: touch; /* Scrolling halus di iOS */
+    -webkit-overflow-scrolling: touch; 
 }
 
 .table {
     width: 100%;
-    min-width: 600px; /* Lebar minimum tabel agar tidak terlalu sempit */
-    border-collapse: collapse; /* Hapus spasi antar border sel */
+    min-width: 600px; 
+    border-collapse: collapse; 
 }
 
 .table th, .table td {
@@ -344,7 +406,7 @@ li {
 }
 
 .table th {
-    background: rgba(var(--primary-color-rgb), 0.1); /* Latar belakang header lebih jelas */
+    background: rgba(var(--primary-color-rgb), 0.1); 
     color: var(--primary-color);
     font-family: var(--font-heading);
     font-weight: 600;
@@ -356,18 +418,18 @@ li {
     transition: background-color var(--transition-speed-fast) ease, transform 0.2s ease;
 }
 .table tbody tr:nth-child(even) {
-    background-color: rgba(var(--text-color-rgb), 0.025); /* Zebra stripe lebih halus */
+    background-color: rgba(var(--text-color-rgb), 0.025); 
 }
 
 .table tbody tr:hover {
-    background-color: rgba(var(--secondary-color-rgb), 0.18); /* Warna hover lebih menarik */
-    transform: scale(1.005); /* Sedikit efek angkat pada hover baris */
+    background-color: rgba(var(--secondary-color-rgb), 0.18); 
+    transform: scale(1.005); 
 }
 
-/* Animasi Item Bertahap (staggered-item) */
+/* Animasi Item Bertahap (staggered-item) - Ini untuk konten di dalam slide-content */
 .staggered-item {
-    opacity: 0; /* Awalnya tidak terlihat, dianimasikan oleh JS */
-    /* Nilai transform awal diatur oleh JavaScript */
+    opacity: 0; 
+    /* Nilai transform awal diatur oleh JavaScript untuk .slide-content, bukan .slide */
 }
 
 /* Animasi Khusus Halaman Selamat Datang */
@@ -376,8 +438,8 @@ li {
 }
 
 .welcome-text h1 {
-    font-size: clamp(2.8rem, 6vw, 4rem); /* Judul selamat datang lebih besar */
-    animation: pulseGlow 2.8s infinite alternate; /* Animasi glow berdenyut */
+    font-size: clamp(2.8rem, 6vw, 4rem); 
+    animation: pulseGlow 2.8s infinite alternate; 
 }
 
 @keyframes pulseGlow {
@@ -407,23 +469,23 @@ li {
 .welcome-topics li {
     margin: 0.6rem 0;
     padding: 0.9rem 2rem;
-    border-radius: 30px; /* Tombol topik lebih bulat */
+    border-radius: 30px; 
     background: linear-gradient(60deg, rgba(var(--primary-color-rgb), 0.12), rgba(var(--secondary-color-rgb), 0.12));
     color: var(--primary-color);
     font-weight: 600;
     font-size: clamp(0.9rem, 2.5vw, 1.05rem);
-    transition: all var(--transition-speed-fast) cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Easing dengan overshoot */
+    transition: all var(--transition-speed-fast) cubic-bezier(0.175, 0.885, 0.32, 1.275); 
     cursor: pointer;
-    border: 2px solid transparent; /* Border transparan untuk efek hover */
+    border: 2px solid transparent; 
     box-shadow: 0 5px 12px -3px rgba(var(--shadow-color-rgb), 0.1);
 }
 
 .welcome-topics li:hover {
     background: linear-gradient(60deg, var(--primary-color), var(--secondary-color));
     color: white;
-    transform: translateY(-8px) scale(1.08) rotate(-2deg); /* Efek hover lebih dinamis */
+    transform: translateY(-8px) scale(1.08) rotate(-2deg); 
     box-shadow: 0 10px 25px -5px rgba(var(--primary-color-rgb), 0.4);
-    border-color: var(--accent-color); /* Border muncul saat hover */
+    border-color: var(--accent-color); 
 }
 
 /* Animasi untuk Contoh di Slide Passive Voice */
@@ -433,28 +495,28 @@ li {
     border-radius: var(--border-radius-sm);
     background: rgba(var(--primary-color-rgb), 0.07);
     margin: 1.8rem 0;
-    overflow: hidden; /* Penting untuk animasi skew/slide */
+    overflow: hidden; 
     transition: all var(--transition-speed-fast) ease;
     border-left: 6px solid var(--primary-color);
 }
 
 .animate-example:hover {
     background: rgba(var(--primary-color-rgb), 0.12);
-    transform: scale(1.02) skewX(-1deg); /* Efek hover halus */
+    transform: scale(1.02) skewX(-1deg); 
     box-shadow: 0 6px 15px -3px rgba(var(--primary-color-rgb), 0.15);
 }
 
 .animate-example p {
     position: relative;
     z-index: 1;
-    opacity: 0; /* Awalnya tidak terlihat, dianimasikan oleh JS */
+    opacity: 0; 
     /* Transform awal diatur oleh JS */
 }
 
 /* Styling Fitur Teks Analitis */
 .analytical-feature {
     display: flex;
-    flex-direction: column; /* Default untuk mobile */
+    flex-direction: column; 
     align-items: flex-start;
     text-align: left;
     margin: 2rem 0;
@@ -467,17 +529,17 @@ li {
 
 .analytical-feature:hover {
     background: rgba(var(--accent-color-rgb), 0.16);
-    transform: translateX(6px) scale(1.015); /* Efek hover lebih subtle */
+    transform: translateX(6px) scale(1.015); 
     box-shadow: 0 10px 20px -5px rgba(var(--accent-color-rgb),0.18);
 }
 
 .feature-icon {
-    margin-right: 0; /* Direset untuk mobile, diubah di media query */
-    margin-bottom: 1.2rem; /* Jarak bawah ikon di mobile */
+    margin-right: 0; 
+    margin-bottom: 1.2rem; 
     flex-shrink: 0;
     color: var(--accent-color);
     background-color: rgba(var(--accent-color-rgb), 0.22);
-    width: 55px; /* Ikon sedikit lebih besar */
+    width: 55px; 
     height: 55px;
     border-radius: 50%;
     display: flex;
@@ -486,25 +548,25 @@ li {
     transition: transform var(--transition-speed-fast) cubic-bezier(0.34, 1.56, 0.64, 1), background-color var(--transition-speed-fast) ease, box-shadow var(--transition-speed-fast) ease;
 }
 .analytical-feature:hover .feature-icon {
-    transform: rotate(30deg) scale(1.2); /* Rotasi lebih besar */
+    transform: rotate(30deg) scale(1.2); 
     background-color: var(--accent-color);
-    color: var(--card-bg); /* Warna ikon berubah saat hover */
-    box-shadow: 0 0 15px rgba(var(--accent-color-rgb), 0.5); /* Tambahkan shadow pada ikon saat hover */
+    color: var(--card-bg); 
+    box-shadow: 0 0 15px rgba(var(--accent-color-rgb), 0.5); 
 }
 
 .feature-icon svg {
-    width: 28px; /* SVG sedikit lebih besar */
+    width: 28px; 
     height: 28px;
     transition: transform 0.2s ease;
 }
 .analytical-feature:hover .feature-icon svg {
-    transform: scale(0.9); /* SVG sedikit mengecil saat hover kontainer */
+    transform: scale(0.9); 
 }
 
 
 .feature-content {
     flex: 1;
-    width: 100%; /* Pastikan konten mengisi ruang */
+    width: 100%; 
 }
 
 .feature-content h3 {
@@ -518,25 +580,25 @@ li {
 /* Tombol Ganti Tema */
 .theme-toggle {
     position: fixed;
-    top: 22px;
+    top: 22px; 
     right: 22px;
     background: var(--card-bg);
     border: 1px solid rgba(var(--text-color-rgb), 0.18);
     border-radius: 50%;
-    width: 55px; /* Tombol lebih besar */
+    width: 55px; 
     height: 55px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     box-shadow: 0 6px 18px -3px var(--shadow-color);
-    z-index: 2000; /* Pastikan di atas elemen lain */
-    transition: all var(--transition-speed-fast) cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Easing dengan overshoot */
-    overflow: hidden; /* Untuk menyembunyikan ikon yang keluar saat transisi */
+    z-index: 2001; 
+    transition: all var(--transition-speed-fast) cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+    overflow: hidden; 
 }
 
 .theme-toggle:hover {
-    transform: scale(1.15) rotate(30deg); /* Efek hover lebih menonjol */
+    transform: scale(1.15) rotate(30deg); 
     box-shadow: 0 10px 25px -5px rgba(var(--primary-color-rgb), 0.35);
 }
 .theme-toggle:active {
@@ -544,15 +606,15 @@ li {
 }
 
 .theme-toggle .icon {
-    font-size: 1.7rem; /* Ikon lebih besar */
-    transition: opacity var(--transition-speed-normal) ease, transform var(--transition-speed-normal) cubic-bezier(0.68, -0.6, 0.265, 1.6); /* Easing lebih dinamis */
-    position: absolute; /* Untuk menumpuk ikon */
+    font-size: 1.7rem; 
+    transition: opacity var(--transition-speed-normal) ease, transform var(--transition-speed-normal) cubic-bezier(0.68, -0.6, 0.265, 1.6); 
+    position: absolute; 
 }
 
 .theme-toggle .icon-moon { opacity: 1; transform: translateY(0) rotate(0deg) scale(1); }
-.theme-toggle .icon-sun { opacity: 0; transform: translateY(130%) rotate(-180deg) scale(0.4); } /* Mulai dari bawah, tersembunyi */
+.theme-toggle .icon-sun { opacity: 0; transform: translateY(130%) rotate(-180deg) scale(0.4); } 
 
-.dark-theme .theme-toggle .icon-moon { opacity: 0; transform: translateY(-130%) rotate(180deg) scale(0.4); } /* Keluar ke atas */
+.dark-theme .theme-toggle .icon-moon { opacity: 0; transform: translateY(-130%) rotate(180deg) scale(0.4); } 
 .dark-theme .theme-toggle .icon-sun { opacity: 1; transform: translateY(0) rotate(0deg) scale(1); }
 
 
@@ -560,42 +622,42 @@ li {
 .team-members-container {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-around; /* Distribusi merata */
-    align-items: flex-start; /* Jaga agar item tetap di atas jika tingginya berbeda */
-    gap: 1.8rem; /* Jarak antar anggota tim */
+    justify-content: space-around; 
+    align-items: flex-start; 
+    gap: 1.8rem; 
     margin-top: 2.2rem;
 }
 
 .team-member {
-    flex-basis: calc(100% - 2rem); /* Default untuk mobile, satu kolom */
-    min-width: 180px; /* Lebar minimum */
+    flex-basis: calc(100% - 2rem); 
+    min-width: 180px; 
     text-align: center;
     padding: 1.8rem;
-    background-color: rgba(var(--card-bg-rgb), 0.95); /* Sedikit lebih solid */
+    background-color: rgba(var(--card-bg-rgb), 0.95); 
     border-radius: var(--border-radius-md);
     box-shadow: 0 12px 30px -10px var(--shadow-color);
     transition: transform var(--transition-speed-fast) cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow var(--transition-speed-fast) ease;
-    border: 1px solid rgba(var(--primary-color-rgb), 0.25); /* Border halus */
+    border: 1px solid rgba(var(--primary-color-rgb), 0.25); 
 }
 
 .team-member:hover {
-    transform: translateY(-10px) scale(1.04) rotate(1deg); /* Efek hover lebih dinamis */
+    transform: translateY(-10px) scale(1.04) rotate(1deg); 
     box-shadow: 0 15px 35px -10px var(--shadow-color-hover);
 }
 
 .member-photo {
-    width: clamp(120px, 30vw, 160px); /* Ukuran foto responsif */
+    width: clamp(120px, 30vw, 160px); 
     height: clamp(120px, 30vw, 160px);
     border-radius: 50%;
-    object-fit: cover; /* Pastikan gambar mengisi tanpa distorsi */
+    object-fit: cover; 
     margin-bottom: 1.4rem;
-    border: 5px solid var(--primary-color); /* Border lebih tebal */
+    border: 5px solid var(--primary-color); 
     box-shadow: 0 6px 15px -3px rgba(var(--primary-color-rgb), 0.3);
     transition: transform var(--transition-speed-fast) cubic-bezier(0.34, 1.56, 0.64, 1), border-color var(--transition-speed-fast) ease;
 }
 .team-member:hover .member-photo {
-    transform: scale(1.08) rotate(5deg); /* Foto membesar dan berputar saat hover */
-    border-color: var(--accent-color); /* Warna border berubah */
+    transform: scale(1.08) rotate(5deg); 
+    border-color: var(--accent-color); 
 }
 
 .member-name {
@@ -604,7 +666,7 @@ li {
     font-size: clamp(1.1rem, 2.8vw, 1.35rem);
     color: var(--primary-color);
     margin-top: 0.8rem;
-    margin-bottom: 0; /* Hapus margin bawah default paragraf */
+    margin-bottom: 0; 
 }
 
 /* Styling untuk Slide "Any Questions?" */
@@ -614,33 +676,33 @@ li {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100%; /* Mengisi seluruh tinggi slide-content */
+    height: 100%; 
 }
 
 .question-mark {
-    font-size: clamp(6rem, 15vw, 8.5rem) !important; /* Ukuran tanda tanya sangat besar */
+    font-size: clamp(6rem, 15vw, 8.5rem) !important; 
     font-family: var(--font-heading);
     color: var(--accent-color);
-    margin-bottom: 1.2rem !important; /* Override margin h1 */
+    margin-bottom: 1.2rem !important; 
     line-height: 1;
-    animation: bounceQuestion 2.2s ease-in-out infinite; /* Animasi memantul */
-    text-shadow: 0 0 20px rgba(var(--accent-color-rgb), 0.4); /* Tambahkan shadow pada tanda tanya */
+    animation: bounceQuestion 2.2s ease-in-out infinite; 
+    text-shadow: 0 0 20px rgba(var(--accent-color-rgb), 0.4); 
 }
 
 @keyframes bounceQuestion {
     0%, 20%, 50%, 80%, 100% { transform: translateY(0) scale(1); }
-    40% { transform: translateY(-30px) scale(1.1); } /* Naik dan membesar */
-    60% { transform: translateY(-15px) scale(1.05); } /* Turun sedikit */
+    40% { transform: translateY(-30px) scale(1.1); } 
+    60% { transform: translateY(-15px) scale(1.05); } 
 }
 
 .question-text {
     font-size: clamp(1.8rem, 4.5vw, 2.6rem);
     font-family: var(--font-heading);
     color: var(--primary-color);
-    opacity: 1 !important; /* Pastikan terlihat jelas */
+    opacity: 1 !important; 
 }
 
-.question-slide h1::after { /* Sembunyikan garis bawah default h1 */
+.question-slide h1::after { 
     display: none;
 }
 
@@ -655,25 +717,25 @@ li {
 }
 
 .thank-you-text {
-    font-family: var(--font-special) !important; /* Font khusus untuk "Thank You" */
-    font-size: clamp(3.5rem, 10vw, 6rem) !important; /* Teks terima kasih lebih besar */
-    color: var(--primary-color) !important; /* Warna fallback jika gradien tidak didukung */
+    font-family: var(--font-special) !important; 
+    font-size: clamp(3.5rem, 10vw, 6rem) !important; 
+    color: var(--primary-color) !important; 
     margin-bottom: 1.5rem !important;
     line-height: 1.2;
-    animation: fadeInScaleUpEnhanced 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.2s forwards, /* Animasi masuk */
-               textGradientFlow 5s linear infinite alternate 1.4s; /* Animasi aliran gradien */
-    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color), var(--accent-color), var(--primary-color)); /* Loop gradien */
+    animation: fadeInScaleUpEnhanced 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.2s forwards, 
+               textGradientFlow 5s linear infinite alternate 1.4s; 
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color), var(--accent-color), var(--primary-color)); 
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    background-size: 400% 100%; /* Ukuran background lebih besar untuk flow yang lebih halus */
+    background-size: 400% 100%; 
 }
 
-@keyframes fadeInScaleUpEnhanced { /* Animasi masuk lebih halus */
+@keyframes fadeInScaleUpEnhanced { 
     from { opacity: 0; transform: scale(0.4) translateY(50px) rotate(-5deg); filter: blur(5px); }
     to { opacity: 1; transform: scale(1) translateY(0) rotate(0deg); filter: blur(0); }
 }
 
-@keyframes textGradientFlow { /* Animasi aliran gradien pada teks */
+@keyframes textGradientFlow { 
     0% { background-position: 0% 50%; }
     100% { background-position: 100% 50%; }
 }
@@ -687,16 +749,16 @@ li {
 
 .thank-you-icon {
     color: var(--accent-color);
-    animation: heartBeatEnhanced 1.6s ease-in-out infinite 1.2s; /* Animasi hati lebih dinamis */
+    animation: heartBeatEnhanced 1.6s ease-in-out infinite 1.2s; 
 }
 
 .thank-you-icon svg {
-    width: clamp(65px, 13vw, 85px); /* Ukuran ikon hati responsif */
+    width: clamp(65px, 13vw, 85px); 
     height: clamp(65px, 13vw, 85px);
-    filter: drop-shadow(0 0 15px rgba(var(--accent-color-rgb), 0.6)); /* Shadow lebih kuat */
+    filter: drop-shadow(0 0 15px rgba(var(--accent-color-rgb), 0.6)); 
 }
 
-@keyframes heartBeatEnhanced { /* Animasi detak jantung lebih kompleks */
+@keyframes heartBeatEnhanced { 
     0% { transform: scale(1) rotate(0deg); }
     10% { transform: scale(1.2) rotate(-5deg); }
     20% { transform: scale(1.1) rotate(5deg); }
@@ -706,14 +768,14 @@ li {
     100% { transform: scale(1) rotate(0deg); }
 }
 
-.thank-you-slide h1::after { /* Sembunyikan garis bawah default h1 */
+.thank-you-slide h1::after { 
     display: none;
 }
 
 
 /* Penyesuaian untuk responsivitas - Media Queries */
 
-@media (min-width: 768px) { /* Tablet dan lebih besar */
+@media (min-width: 768px) { 
     .slide {
         padding: 2.5rem 2rem 9rem 2rem;
     }
@@ -721,20 +783,20 @@ li {
         padding: 3rem 3.5rem;
     }
     .analytical-feature {
-        flex-direction: row; /* Ikon dan konten berdampingan */
+        flex-direction: row; 
         align-items: center;
         text-align: left;
     }
     .feature-icon {
-        margin-right: 2rem; /* Jarak ikon lebih besar */
-        margin-bottom: 0; /* Hapus margin bawah ikon */
+        margin-right: 2rem; 
+        margin-bottom: 0; 
     }
     .team-member {
-        flex-basis: calc(48% - 1.8rem); /* Dua kolom untuk anggota tim */
+        flex-basis: calc(48% - 1.8rem); 
     }
 }
 
-@media (min-width: 992px) { /* Desktop kecil dan lebih besar */
+@media (min-width: 992px) { 
     .slide {
         padding: 3rem 2.5rem 9rem 2.5rem;
     }
@@ -742,20 +804,28 @@ li {
         padding: 3.5rem 4rem;
     }
     .team-member {
-        flex-basis: calc(30% - 1.8rem); /* Tiga kolom untuk anggota tim */
+        flex-basis: calc(30% - 1.8rem); 
     }
 }
 
-@media (max-width: 359px) { /* Layar sangat kecil */
+@media (max-width: 359px) { 
     body {
-        font-size: 14px; /* Ukuran font dasar lebih kecil */
+        font-size: 14px; 
+        padding-top: 8px; 
+    }
+    .progress-bar-container {
+        height: 8px; 
+    }
+    .presentation-container {
+        height: calc(100% - 8px);
     }
     .slide {
-        padding: 1.5rem 1rem 7rem 1rem; /* Padding lebih kecil */
+        padding: 1.5rem 1rem 7rem 1rem; 
     }
     .slide-content {
-        padding: 1.8rem; /* Padding konten sedikit lebih besar */
-        border-radius: var(--border-radius-sm); /* Radius border lebih kecil */
+        padding: 1.8rem; 
+        border-radius: var(--border-radius-sm); 
+        margin-top: 0.5rem;
     }
     h1 {
         margin-bottom: 1.8rem;
@@ -771,7 +841,7 @@ li {
         padding: 0.75rem 1.6rem;
     }
     .dots-navigation {
-        bottom: 5.8rem; /* Titik navigasi sedikit lebih tinggi */
+        bottom: 5.8rem; 
         gap: 0.9rem;
     }
     .dot {
@@ -781,7 +851,7 @@ li {
     .theme-toggle {
         width: 48px;
         height: 48px;
-        top: 18px;
+        top: 18px; 
         right: 18px;
     }
     .theme-toggle .icon {
@@ -791,23 +861,19 @@ li {
         padding: 0.75rem 1.6rem;
     }
     .member-photo {
-        border-width: 4px; /* Border foto lebih tipis */
+        border-width: 4px; 
     }
 }
 
 
-/* Keyframes untuk animasi umum yang lebih halus */
-/* Tidak lagi digunakan secara langsung, animasi dikontrol via JS untuk staggered-item */
-
 /* Animasi masuk untuk teks di .animate-example (CSS Keyframe) */
-/* JavaScript akan menambahkan kelas atau langsung memanipulasi style untuk memicu ini */
 @keyframes slideInTextEnhancedV2 {
     0% {
         opacity: 0;
-        transform: translateX(-40px) skewX(-15deg) rotate(-3deg); /* Lebih dinamis */
+        transform: translateX(-40px) skewX(-15deg) rotate(-3deg); 
         filter: blur(5px);
     }
-    60% { /* Titik tengah animasi untuk efek 'overshoot' halus */
+    60% { 
         opacity: 0.95;
         transform: translateX(12px) skewX(5deg) rotate(1deg);
         filter: blur(0.5px);
